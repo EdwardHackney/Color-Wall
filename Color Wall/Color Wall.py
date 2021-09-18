@@ -9,7 +9,7 @@ win = pygame.display.set_mode((windowWidth, windowHeight))
 pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
-stickForwardImage = pygame.image.load("CS python project 1\FinnStick.png").convert_alpha()
+stickForwardImage = pygame.image.load("Color Wall\FinnStick.png").convert_alpha()
 
 class Stickman:
     def __init__(self, pos):
@@ -41,6 +41,7 @@ deletedSquares = []
 
 stickman = Stickman((20,230))
 changeRectColor = (255,255,255)
+changeWallColor = (255, 255, 255)
 
 while running:
     #Window stuff
@@ -71,6 +72,7 @@ while running:
         changeRectColor = (127,255,0)
 
     pygame.draw.rect(win, (changeRectColor), (20, 300, 75, 300))
+    pygame.draw.rect(win, (changeWallColor), (725, 0, 75, 600))
     pygame.display.update()
 
 
