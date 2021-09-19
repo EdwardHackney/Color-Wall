@@ -1,4 +1,4 @@
-import pygame, random, time
+import pygame, random
 
 # Window Setup
 windowWidth = 800
@@ -7,9 +7,18 @@ pygame.init()
 win = pygame.display.set_mode((windowWidth, windowHeight))
 
 pygame.font.init()
-myfont = pygame.font.SysFont('Comic Sans MS', 30)
+font = pygame.font.SysFont('Comic Sans MS', 30)
 
 stickForwardImage = pygame.image.load("Color Wall\FinnStick.png").convert_alpha()
+
+colors = [
+    (255, 165, 0),
+    (138,43,226),
+    (255, 0, 0),
+    (127,255,0)
+]
+
+changeRectColor = (255,255,255)
 
 class Stickman:
     def __init__(self, pos):
@@ -20,31 +29,44 @@ class Stickman:
         self.sprite = pygame.transform.scale(self.sprite, (75, 75))
 
     def draw(self):
-        win.blit(self.sprite, self.pos)
+        if not self.dead:
+            win.blit(self.sprite, self.pos)
 
-class colorWall:
-    def __init__(self, color, pos):
+stickman = Stickman((20,230))
+
+class ColorWall:
+    def __init__(self, color, x):
         self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.speed = speed
-        self.colorChange = colorChange
         self.color = color
-        self.pos = pos
+
+    def draw(self):
+        pygame.draw.rect(win, self.color, (self.x, 0, 75, 600))
+
+    def update(self):
+        if not stickman.dead:
+            self.x -= 3
+            if self.x <= -75:
+                self.x = 800
+                stickman.score += 1
+                print(stickman.score)
+                self.color = random.choice(colors)
+            elif self.x >= 20 and self.x <= 95 and changeRectColor != self.color:
+                stickman.dead = True
 
 
 running = True
 
-squares = []
-deletedSquares = []
+walls = []
+for i in range(2):
+    walls.append(ColorWall(random.choice(colors), (i+3)*875/2))
 
-stickman = Stickman((20,230))
-changeRectColor = (255,255,255)
 changeWallColor = (255, 255, 255)
+scoreDisplay = font.render("Your Score: 0", True, (50, 50, 50))
+scoreDisplayText = str(stickman.score)
+
 
 while running:
-    #Window stuff
+    # Window stuff
     pygame.time.delay(10)
 
     for event in pygame.event.get():
@@ -57,22 +79,27 @@ while running:
     stickman.draw()
 
     #Change player color
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_1]:
-        #Orange
-        changeRectColor = (255, 165, 0)
-    elif keys[pygame.K_2]:
-        #Purple
-        changeRectColor = (138,43,226)
-    elif keys[pygame.K_3]:
-        #Red
-        changeRectColor = (255, 0, 0)
-    elif keys[pygame.K_4]:
-        #Chartruese
-        changeRectColor = (127,255,0)
+    if not stickman.dead:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_1]:
+            #Orange
+            changeRectColor = colors[0]
+        elif keys[pygame.K_2]:
+            #Purple
+            changeRectColor = colors[1]
+        elif keys[pygame.K_3]:
+            #Red
+            changeRectColor = colors[2]
+        elif keys[pygame.K_4]:
+            #Chartruese
+            changeRectColor = colors[3]
 
     pygame.draw.rect(win, (changeRectColor), (20, 300, 75, 300))
-    pygame.draw.rect(win, (changeWallColor), (725, 0, 75, 600))
+    for wall in walls:
+        wall.draw()
+        wall.update()
+    scoreDisplayText = font.render("Your Score: " + str(stickman.score), True, (0, 0, 0))
+    win.blit(scoreDisplayText, (25, 15))
     pygame.display.update()
 
 
